@@ -12,7 +12,7 @@
         }
 
         body {
-            font-family: 'Comic Sans MS', cursive, sans-serif;
+            font-family: 'Times New Roman', Times, serif;
             overflow: hidden;
             background: linear-gradient(45deg, #ff9a9e, #fecfef, #fecfef, #ff9a9e);
             background-size: 400% 400%;
@@ -52,11 +52,13 @@
 
         /* Page 1 - Welcome */
         .welcome-title {
+            font-family: 'Times New Roman', Times, serif;
             font-size: 4rem;
             color: #ff6b9d;
             margin-bottom: 2rem;
             text-shadow: 3px 3px 6px rgba(0,0,0,0.1);
             animation: bounce 2s infinite;
+            font-weight: bold;
         }
 
         @keyframes bounce {
@@ -77,10 +79,12 @@
         }
 
         .penguin-message {
+            font-family: 'Times New Roman', Times, serif;
             font-size: 2rem;
             color: #4a90e2;
             margin-top: 1rem;
             animation: fadeInUp 2s ease-out;
+            font-weight: bold;
         }
 
         @keyframes fadeInUp {
@@ -120,15 +124,19 @@
         }
 
         .memory-title {
+            font-family: 'Times New Roman', Times, serif;
             font-size: 2.5rem;
             color: #ff6b9d;
             margin-bottom: 1rem;
+            font-weight: bold;
         }
 
         .memory-description {
+            font-family: 'Times New Roman', Times, serif;
             font-size: 1.3rem;
             color: #666;
             line-height: 1.6;
+            font-weight: normal;
         }
 
         /* Happy Cat Page */
@@ -149,6 +157,7 @@
         }
 
         .cat-message {
+            font-family: 'Times New Roman', Times, serif;
             font-size: 2.5rem;
             color: #ff6b9d;
             font-weight: bold;
@@ -177,6 +186,7 @@
         }
 
         .special-text {
+            font-family: 'Times New Roman', Times, serif;
             font-size: 1.8rem;
             color: #d63384;
             line-height: 1.8;
@@ -203,6 +213,7 @@
         }
 
         .farewell-title {
+            font-family: 'Times New Roman', Times, serif;
             font-size: 2.8rem;
             color: #ff6b9d;
             margin-bottom: 1rem;
@@ -211,9 +222,11 @@
         }
 
         .farewell-text {
+            font-family: 'Times New Roman', Times, serif;
             font-size: 1.5rem;
             color: #666;
             line-height: 1.6;
+            font-weight: normal;
         }
 
         /* Final page special styling */
@@ -256,6 +269,7 @@
         }
 
         .nav-btn {
+            font-family: 'Times New Roman', Times, serif;
             background: rgba(255,107,157,0.8);
             border: none;
             color: white;
@@ -390,6 +404,17 @@
             background: linear-gradient(90deg, #ff9a9e, #fad0c4);
             transition: width 0.8s ease;
         }
+
+        /* Additional styles for better mobile consistency */
+        .cat-container div:not(.happy-cat) {
+            font-family: 'Times New Roman', Times, serif;
+            font-weight: normal;
+        }
+
+        /* Ensure all text elements use Times New Roman */
+        h1, h2, h3, h4, h5, h6, p, div, span, button {
+            font-family: 'Times New Roman', Times, serif;
+        }
     </style>
 </head>
 <body>
@@ -449,7 +474,7 @@
         <div class="cat-container">
             <div class="happy-cat">😸</div>
             <div class="cat-message">Happy Happy Vibes! ✨</div>
-            <div style="font-size: 1.5rem; color: #666; margin-top: 1rem;">
+            <div style="font-size: 1.5rem; color: #666; margin-top: 1rem; font-family: 'Times New Roman', Times, serif;">
                 Sending you all the positive energy and joy! 🌟
             </div>
         </div>
