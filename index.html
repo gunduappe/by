@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goodbye Junnu 💕</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            overflow: hidden;
+            background: linear-gradient(45deg, #ff9a9e, #fecfef, #fecfef, #ff9a9e);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+            height: 100vh;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .page {
+            position: absolute;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            text-align: center;
+            padding: 20px;
+        }
+
+        .page.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .page.prev {
+            transform: translateX(-100%);
+        }
+
+        /* Page 1 - Welcome */
+        .welcome-title {
+            font-size: 4rem;
+            color: #ff6b9d;
+            margin-bottom: 2rem;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.1);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-20px); }
+            60% { transform: translateY(-10px); }
+        }
+
+        .penguin {
+            font-size: 8rem;
+            animation: waddle 3s ease-in-out infinite;
+            margin: 2rem 0;
+        }
+
+        @keyframes waddle {
+            0%, 100% { transform: rotate(-10deg); }
+            50% { transform: rotate(10deg); }
+        }
+
+        .penguin-message {
+            font-size: 2rem;
+            color: #4a90e2;
+            margin-top: 1rem;
+            animation: fadeInUp 2s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Memory Pages */
+        .memory-container {
+            max-width: 800px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .memory-image {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            border: 8px solid #ff9a9e;
+            object-fit: cover;
+            margin-bottom: 2rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .memory-title {
+            font-size: 2.5rem;
+            color: #ff6b9d;
+            margin-bottom: 1rem;
+        }
+
+        .memory-description {
+            font-size: 1.3rem;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* Happy Cat Page */
+        .cat-container {
+            text-align: center;
+        }
+
+        .happy-cat {
+            font-size: 12rem;
+            animation: catDance 1s ease-in-out infinite;
+            margin: 2rem 0;
+        }
+
+        @keyframes catDance {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.1) rotate(-5deg); }
+            75% { transform: scale(1.1) rotate(5deg); }
+        }
+
+        .cat-message {
+            font-size: 2.5rem;
+            color: #ff6b9d;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Special Message Page */
+        .special-message {
+            max-width: 700px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 25px;
+            padding: 4rem;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        .heart-emoji {
+            font-size: 4rem;
+            animation: heartBeat 1.5s ease-in-out infinite;
+            margin-bottom: 2rem;
+        }
+
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+
+        .special-text {
+            font-size: 1.8rem;
+            color: #d63384;
+            line-height: 1.8;
+            font-weight: bold;
+        }
+
+        /* Farewell Pages Styles */
+        .farewell-container {
+            max-width: 600px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 25px;
+            padding: 3rem;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        .farewell-gif {
+            width: 200px;
+            height: 200px;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            animation: float 3s ease-in-out infinite;
+            border: 4px solid #ff9a9e;
+        }
+
+        .farewell-title {
+            font-size: 2.8rem;
+            color: #ff6b9d;
+            margin-bottom: 1rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .farewell-text {
+            font-size: 1.5rem;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* Final page special styling */
+        .final-farewell {
+            background: linear-gradient(135deg, rgba(255,154,158,0.9), rgba(254,207,239,0.9));
+            border: 3px solid rgba(255,255,255,0.3);
+        }
+
+        .final-farewell .farewell-title {
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-size: 3.2rem;
+        }
+
+        .final-farewell .farewell-text {
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .stars {
+            font-size: 3rem;
+            animation: twinkle 2s ease-in-out infinite;
+            margin-top: 1rem;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        /* Navigation */
+        .nav-container {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            background: rgba(255,107,157,0.8);
+            border: none;
+            color: white;
+            padding: 15px 25px;
+            margin: 0 10px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            background: rgba(255,107,157,1);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Floating Elements - Stars and Butterflies */
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .floating-star {
+            position: absolute;
+            font-size: 1.5rem;
+            color: rgba(255,215,0,0.8);
+            animation: starFloat 10s linear infinite;
+        }
+
+        .floating-butterfly {
+            position: absolute;
+            font-size: 2rem;
+            animation: butterflyFloat 12s ease-in-out infinite;
+        }
+
+        .floating-sparkle {
+            position: absolute;
+            font-size: 1rem;
+            color: rgba(255,255,255,0.9);
+            animation: sparkleFloat 8s linear infinite;
+        }
+
+        @keyframes starFloat {
+            0% {
+                transform: translateY(100vh) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(50px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes butterflyFloat {
+            0% {
+                transform: translateY(100vh) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            25% {
+                transform: translateY(75vh) translateX(100px) rotate(15deg);
+            }
+            50% {
+                transform: translateY(50vh) translateX(-50px) rotate(-10deg);
+            }
+            75% {
+                transform: translateY(25vh) translateX(150px) rotate(20deg);
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes sparkleFloat {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            20% {
+                opacity: 1;
+                transform: translateY(80vh) scale(1);
+            }
+            80% {
+                opacity: 1;
+                transform: translateY(20vh) scale(1);
+            }
+            100% {
+                transform: translateY(-100px) scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            z-index: 1000;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ff9a9e, #fad0c4);
+            transition: width 0.8s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="floating-elements" id="floatingElements"></div>
+
+    <div class="page active" id="page1">
+        <h1 class="welcome-title">Hiii Junnuuuuuuu! </h1>
+        <div class="penguin">🐧</div>
+        <div class="penguin-message">Penguin says Hi! 👋</div>
+    </div>
+
+    <div class="page" id="page2">
+        <div class="memory-container">
+            <img src="image1.jpeg" alt="Memory 1" class="memory-image">
+            <h2 class="memory-title">Your Son</h2>
+            <p class="memory-description">
+                HEHEHEHEH....your Bunny ...Dont miss your bunnyyy!
+            </p>
+        </div>
+    </div>
+
+    <div class="page" id="page3">
+        <div class="memory-container">
+            <img src="image2.jpeg" alt="Memory 2" class="memory-image">
+            <h2 class="memory-title">Unforgettable Moments</h2>
+            <p class="memory-description">
+                LALALALLALA.....Ghibili Photoooo...With Maharaniii...!
+            </p>
+        </div>
+    </div>
+
+    <div class="page" id="page4">
+        <div class="memory-container">
+            <img src="image3.jpeg" alt="Memory 3" class="memory-image">
+            <h2 class="memory-title">Worlds Best Art</h2>
+            <p class="memory-description">
+                HUUUUU.....Madam's Art ......Very famous Art costlier than Picasso..!!
+            </p>
+        </div>
+    </div>
+
+    <div class="page" id="page5">
+        <div class="memory-container">
+            <img src="image4.jpeg" alt="Memory 4" class="memory-image">
+            <h2 class="memory-title">Forever Friends</h2>
+            <p class="memory-description">
+                Bestttt Selfieee Award goes to this Piccc....!!
+            </p>
+        </div>
+    </div>
+
+    <div class="page" id="page6">
+        <div class="cat-container">
+            <div class="happy-cat">😸</div>
+            <div class="cat-message">Happy Happy Vibes! ✨</div>
+            <div style="font-size: 1.5rem; color: #666; margin-top: 1rem;">
+                Sending you all the positive energy and joy! 🌟
+            </div>
+        </div>
+    </div>
+
+    <div class="page" id="page7">
+        <div class="special-message">
+            <div class="heart-emoji">💕</div>
+            <div class="special-text">
+                 Junnu ....chotuuu puttaniii...,<br><br>
+                Yeyyyyy Junnuu madamm is going home ....heheheh ..mast mast food ella ...yeyyyy..hehehe.<br><br>
+                Matteee..function ella will be there madam will be busy with new dress ella ..hehehe..hahah...Matte madam is going to meet laddu ,gubba ella...yess ..i am happy...and your also showing me laddu and gubba heheh.. 
+            </div>
+        </div>
+    </div>
+
+    <!-- Happy Journey Page -->
+    <div class="page" id="page8">
+        <div class="farewell-container">
+            <img src="https://media.giphy.com/media/3o7TKSjRrfIPjeiVyM/giphy.gif" alt="Happy Journey" class="farewell-gif">
+            <h2 class="farewell-title">Happy Journey! 🚌🚌</h2>
+            <p class="farewell-text">Have a wonderful and Safe Journey chotu papuuuu! 🎉</p>
+        </div>
+    </div>
+
+    <!-- Take Care Page -->
+    <div class="page" id="page9">
+        <div class="farewell-container">
+            <img src="https://i.pinimg.com/originals/c9/48/8d/c9488db1b1a8cd9c4576a1bcc6f5a07d.gif" alt="Take Care" class="farewell-gif">
+            <h2 class="farewell-title">Take Care! </h2>
+            <p class="farewell-text">Stay safe and healthy always! You're precious and very important! 🌟</p>
+        </div>
+    </div>
+
+    <!-- Bye Bye Page -->
+    <div class="page" id="page10">
+        <div class="farewell-container">
+            <img src="https://i.pinimg.com/originals/59/d1/71/59d17122934ef58fb24fda82d8854214.gif" alt="Bye Bye" class="farewell-gif">
+            <h2 class="farewell-title">Bye Bye! 👋</h2>
+            <p class="farewell-text">i will be waiting for your text, sweet Junnu! 💫</p>
+        </div>
+    </div>
+
+    <!-- Meet You Monday Page -->
+    <div class="page" id="page11">
+        <div class="farewell-container">
+            <img src="https://media3.giphy.com/media/ZCgbFvjn3AG5gKeDGH/200w.gif?cid=6c09b952r9m7jt424fews44nbqvpfi5l5b3jyu678ndsff3b&ep=v1_gifs_search&rid=200w.gif&ct=g" alt="See You Soon" class="farewell-gif">
+            <h2 class="farewell-title">Meet You Coming Monday! 📅</h2>
+            <p class="farewell-text">Can't wait to see you again next week! Miss you already! </p>
+        </div>
+    </div>
+
+    <!-- Final Tata Page -->
+    <div class="page" id="page12">
+        <div class="farewell-container final-farewell">
+            <img src="https://media.giphy.com/media/26u4cqiYI30juCOGY/giphy.gif" alt="Tata" class="farewell-gif">
+            <h2 class="farewell-title">Tata Kuchipuchikooooo! 🐧🐧🐧🫂🫂</h2>
+            <p class="farewell-text"></p>
+            <div class="stars">✨ ⭐ ✨ ⭐ ✨</div>
+        </div>
+    </div>
+
+    <div class="nav-container">
+        <button class="nav-btn" id="prevBtn" onclick="previousPage()" disabled>← Previous</button>
+        <button class="nav-btn" id="nextBtn" onclick="nextPage()">Next →</button>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        const totalPages = 12;
+
+        // Create floating elements (stars, butterflies, sparkles)
+        function createFloatingElement() {
+            const elements = ['⭐', '✨', '🌟', '🦋', '🌸', '💫', '🌙', '☄️'];
+            const element = document.createElement('div');
+            const randomElement = elements[Math.floor(Math.random() * elements.length)];
+            
+            if (randomElement === '🦋') {
+                element.className = 'floating-butterfly';
+            } else if (['⭐', '🌟', '🌙', '☄️'].includes(randomElement)) {
+                element.className = 'floating-star';
+            } else {
+                element.className = 'floating-sparkle';
+            }
+            
+            element.innerHTML = randomElement;
+            element.style.left = Math.random() * 100 + '%';
+            element.style.animationDuration = (Math.random() * 4 + 6) + 's';
+            element.style.animationDelay = Math.random() * 3 + 's';
+            
+            document.getElementById('floatingElements').appendChild(element);
+            
+            setTimeout(() => {
+                element.remove();
+            }, 12000);
+        }
+
+        // Create floating elements periodically
+        setInterval(createFloatingElement, 800);
+
+        function updateProgress() {
+            const progress = (currentPage / totalPages) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function updateNavButtons() {
+            document.getElementById('prevBtn').disabled = currentPage === 1;
+            document.getElementById('nextBtn').disabled = currentPage === totalPages;
+            
+            if (currentPage === totalPages) {
+                document.getElementById('nextBtn').innerHTML = '🏁 The End';
+            } else {
+                document.getElementById('nextBtn').innerHTML = 'Next →';
+            }
+        }
+
+        function showPage(pageNum) {
+            // Hide all pages
+            const pages = document.querySelectorAll('.page');
+            pages.forEach((page, index) => {
+                page.classList.remove('active', 'prev');
+                if (index + 1 < pageNum) {
+                    page.classList.add('prev');
+                } else if (index + 1 === pageNum) {
+                    page.classList.add('active');
+                }
+            });
+            
+            updateProgress();
+            updateNavButtons();
+        }
+
+        function nextPage() {
+            if (currentPage < totalPages) {
+                currentPage++;
+                showPage(currentPage);
+            }
+        }
+
+        function previousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                showPage(currentPage);
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                nextPage();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                previousPage();
+            }
+        });
+
+        // Touch/swipe support
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', function(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+            
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    nextPage(); // Swipe left = next page
+                } else {
+                    previousPage(); // Swipe right = previous page
+                }
+            }
+        }
+
+        // Initialize
+        updateProgress();
+        updateNavButtons();
+
+        // Auto-start with a welcome animation
+        setTimeout(() => {
+            const welcomeTitle = document.querySelector('.welcome-title');
+            welcomeTitle.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                welcomeTitle.style.transform = 'scale(1)';
+            }, 200);
+        }, 500);
+    </script>
+</body>
+</html>
