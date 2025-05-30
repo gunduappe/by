@@ -39,6 +39,7 @@
             transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             text-align: center;
             padding: 20px;
+            padding-bottom: 120px; /* Add space for navigation */
         }
 
         .page.active {
@@ -259,18 +260,22 @@
             50% { opacity: 1; }
         }
 
-        /* Navigation */
+        /* Navigation - FIXED POSITIONING */
         .nav-container {
             position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
+            bottom: 20px;
+            left: 0;
+            right: 0;
             z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 20px;
         }
 
         .nav-btn {
             font-family: 'Times New Roman', Times, serif;
-            background: rgba(255,107,157,0.8);
+            background: rgba(255,107,157,0.9);
             border: none;
             color: white;
             padding: 15px 25px;
@@ -281,18 +286,24 @@
             font-weight: bold;
             transition: all 0.3s ease;
             backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            min-width: 120px;
         }
 
         .nav-btn:hover {
             background: rgba(255,107,157,1);
             transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
         }
 
         .nav-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             transform: none;
+        }
+
+        .nav-btn:active {
+            transform: translateY(-1px);
         }
 
         /* Floating Elements - Stars and Butterflies */
@@ -414,6 +425,62 @@
         /* Ensure all text elements use Times New Roman */
         h1, h2, h3, h4, h5, h6, p, div, span, button {
             font-family: 'Times New Roman', Times, serif;
+        }
+
+        /* Mobile responsive adjustments */
+        @media (max-width: 768px) {
+            .welcome-title {
+                font-size: 3rem;
+            }
+            
+            .penguin {
+                font-size: 6rem;
+            }
+            
+            .memory-image {
+                width: 250px;
+                height: 250px;
+            }
+            
+            .memory-container {
+                padding: 2rem;
+            }
+            
+            .special-message {
+                padding: 2.5rem;
+            }
+            
+            .farewell-container {
+                padding: 2rem;
+            }
+            
+            .nav-btn {
+                padding: 12px 20px;
+                font-size: 1rem;
+                min-width: 100px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .welcome-title {
+                font-size: 2.5rem;
+            }
+            
+            .penguin {
+                font-size: 5rem;
+            }
+            
+            .memory-image {
+                width: 200px;
+                height: 200px;
+            }
+            
+            .nav-btn {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+                min-width: 80px;
+                margin: 0 5px;
+            }
         }
     </style>
 </head>
