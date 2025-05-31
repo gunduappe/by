@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Universe of Us</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            touch-action: manipulation;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #000;
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+        }
+
+        .page {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .page.active {
+            display: flex;
+        }
+
+        .page-title {
+            position: absolute;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: clamp(24px, 5vw, 48px);
+            font-weight: bold;
+            text-align: center;
+            background: linear-gradient(45deg, #ff6b9d, #c471ed, #12c2e9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(255, 107, 157, 0.5);
+            z-index: 100;
+        }
+
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        .clickable-area {
+            position: absolute;
+            pointer-events: all;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .clickable-area:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, rgba(20, 20, 40, 0.95), rgba(40, 20, 60, 0.95));
+            padding: 30px;
+            border-radius: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            z-index: 200;
+            max-width: 90vw;
+            max-height: 80vh;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .popup.show {
+            display: block;
+            animation: popupAppear 0.5s ease-out;
+        }
+
+        @keyframes popupAppear {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .navigation {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            background: linear-gradient(45deg, #ff6b9d, #c471ed);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.3);
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 157, 0.5);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .countdown {
+            font-size: clamp(20px, 4vw, 36px);
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(255, 107, 157, 0.2), rgba(196, 113, 237, 0.2));
+            border-radius: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            text-align: center;
+        }
+
+        .audio-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+
+        .audio-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            color: white;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .audio-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 18px;
+            z-index: 1000;
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: sparkle 1s ease-out forwards;
+        }
+
+        @keyframes sparkle {
+            0% { opacity: 1; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0); }
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .page-title {
+                top: 30px;
+                font-size: clamp(20px, 6vw, 36px);
+            }
+            
+            .popup {
+                padding: 20px;
+                margin: 20px;
+            }
+            
+            .navigation {
+                bottom: 20px;
+            }
+            
+            .nav-btn {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading" id="loading">Loading Your Universe... ✨</div>
+    
+    <div class="audio-controls">
+        <button class="audio-btn" id="audioToggle">🎵</button>
+    </div>
+
+    <!-- Page 1: Enter Our Universe -->
+    <div class="page active" id="page1">
+        <h1 class="page-title">Enter Our Universe</h1>
+        <div id="canvas-container"></div>
+        <p style="position: absolute; bottom: 100px; text-align: center; font-size: 18px; opacity: 0.8;">
+            Click the portal to begin our journey... ✨
+        </p>
+    </div>
+
+    <!-- Page 2: Where We Started -->
+    <div class="page" id="page2">
+        <h1 class="page-title">Where We Started</h1>
+        <div id="canvas-container2"></div>
+        <div class="ui-overlay" id="planetOverlay"></div>
+        <p style="position: absolute; bottom: 100px; text-align: center; font-size: 16px; opacity: 0.8;">
+            Rotate the planet and click the glowing spots to explore our memories! 🌍
+        </p>
+    </div>
+
+    <!-- Page 3: Messages in the Stars -->
+    <div class="page" id="page3">
+        <h1 class="page-title">Messages in the Stars</h1>
+        <div id="canvas-container3"></div>
+        <p style="position: absolute; bottom: 100px; text-align: center; font-size: 16px; opacity: 0.8;">
+            Click the twinkling stars to read special messages! ⭐
+        </p>
+    </div>
+
+    <!-- Page 4: The Blooming Laughs -->
+    <div class="page" id="page4">
+        <h1 class="page-title">The Blooming Laughs</h1>
+        <div id="canvas-container4"></div>
+        <p style="position: absolute; bottom: 100px; text-align: center; font-size: 16px; opacity: 0.8;">
+            Touch the flowers to see our inside jokes bloom! 🌸
+        </p>
+    </div>
+
+    <!-- Page 5: See You Soon -->
+    <div class="page" id="page5">
+        <h1 class="page-title">See You Soon</h1>
+        <div id="canvas-container5"></div>
+        <div class="countdown" id="countdown">
+            <div>Until you return:</div>
+            <div id="countdownTimer">Calculating...</div>
+        </div>
+        <p style="position: absolute; bottom: 100px; text-align: center; font-size: 16px; opacity: 0.8;">
+            Click the rocket when you're ready for takeoff! 🚀
+        </p>
+    </div>
+
+    <!-- Navigation -->
+    <div class="navigation">
+        <button class="nav-btn" id="prevBtn" onclick="prevPage()" disabled>← Previous</button>
+        <button class="nav-btn" id="nextBtn" onclick="nextPage()">Next →</button>
+    </div>
+
+    <!-- Popups -->
+    <div class="popup" id="memoryPopup">
+        <button class="close-btn" onclick="closePopup('memoryPopup')">&times;</button>
+        <h3 id="memoryTitle">Memory Title</h3>
+        <p id="memoryContent">Memory content goes here...</p>
+    </div>
+
+    <div class="popup" id="starPopup">
+        <button class="close-btn" onclick="closePopup('starPopup')">&times;</button>
+        <h3 id="starTitle">Star Message</h3>
+        <p id="starContent">Star message goes here...</p>
+    </div>
+
+    <div class="popup" id="flowerPopup">
+        <button class="close-btn" onclick="closePopup('flowerPopup')">&times;</button>
+        <h3 id="flowerTitle">Inside Joke</h3>
+        <p id="flowerContent">Joke content goes here...</p>
+    </div>
+
+    <div class="popup" id="rocketPopup">
+        <button class="close-btn" onclick="closePopup('rocketPopup')">&times;</button>
+        <h3>Until We Meet Again</h3>
+        <p>Our friendship is a universe of infinite possibilities. Distance means nothing when you mean everything. See you soon, my amazing friend! 💖✨</p>
+        <video width="100%" controls style="margin-top: 15px; border-radius: 10px;">
+            <source src="#" type="video/mp4">
+            Your farewell video would go here!
+        </video>
+    </div>
+
+    <audio id="backgroundMusic" loop>
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAGcfAAACABAAZGF0YWoGAAA=" type="audio/wav">
+    </audio>
+
+    <script>
+        let currentPage = 1;
+        let scenes = {};
+        let renderers = {};
+        let cameras = {};
+        let isAudioPlaying = false;
+
+        // Sample data - you can customize these!
+        const memories = [
+            { title: "First Meeting", content: "Remember when we first met at that coffee shop? You spilled your latte and we both laughed for 10 minutes straight! ☕" },
+            { title: "Movie Marathon", content: "That epic 12-hour movie marathon where we watched all the Marvel movies and ate our weight in popcorn! 🍿" },
+            { title: "Road Trip Adventure", content: "Our spontaneous road trip where we got lost but found the most beautiful sunset spot ever! 🌅" },
+            { title: "Late Night Talks", content: "Those 3 AM deep conversations that made us realize we're soulmates in friendship! 🌙" }
+        ];
+
+        const starMessages = [
+            { title: "You're Amazing", content: "Just a reminder that you're absolutely incredible and I'm so lucky to have you as my friend! 💫" },
+            { title: "Miss You", content: "Missing your laugh, your hugs, and your terrible dad jokes! Come back soon! 😄" },
+            { title: "Friendship Goals", content: "We're proof that best friends are the family we choose for ourselves! 👯‍♀️" },
+            { title: "Always Here", content: "No matter where life takes us, I'll always be here for you. Distance is just a number! 💝" },
+            { title: "Future Plans", content: "Already planning our next adventure for when you get back! Get ready! 🎉" }
+        ];
+
+        const jokes = [
+            { title: "That Thing We Say", content: "\"That's what she said!\" - Our automatic response to literally everything! 😂" },
+            { title: "Your Weird Laugh", content: "Your snort-laugh is my favorite sound in the world! Never change! 🐷" },
+            { title: "Food Obsession", content: "Remember when you ate pizza for breakfast, lunch, AND dinner for a week? Legend! 🍕" },
+            { title: "Dance Moves", content: "Your \"secret\" dance moves that you think no one sees... we all see them! 💃" }
+        ];
+
+        function initPage1() {
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x000011, 1);
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            // Create starfield background
+            const starsGeometry = new THREE.BufferGeometry();
+            const starsMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 2 });
+            const starsVertices = [];
+            for (let i = 0; i < 1000; i++) {
+                starsVertices.push((Math.random() - 0.5) * 2000);
+                starsVertices.push((Math.random() - 0.5) * 2000);
+                starsVertices.push((Math.random() - 0.5) * 2000);
+            }
+            starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starsVertices, 3));
+            const stars = new THREE.Points(starsGeometry, starsMaterial);
+            scene.add(stars);
+
+            // Create portal
+            const portalGeometry = new THREE.RingGeometry(2, 4, 32);
+            const portalMaterial = new THREE.MeshBasicMaterial({
+                color: 0xff6b9d,
+                transparent: true,
+                opacity: 0.8,
+                side: THREE.DoubleSide
+            });
+            const portal = new THREE.Mesh(portalGeometry, portalMaterial);
+            scene.add(portal);
+
+            // Portal glow effect
+            const glowGeometry = new THREE.RingGeometry(1.5, 4.5, 32);
+            const glowMaterial = new THREE.MeshBasicMaterial({
+                color: 0xc471ed,
+                transparent: true,
+                opacity: 0.3,
+                side: THREE.DoubleSide
+            });
+            const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+            scene.add(glow);
+
+            camera.position.z = 10;
+
+            // Animation loop
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                portal.rotation.z += 0.01;
+                glow.rotation.z -= 0.005;
+                stars.rotation.y += 0.0005;
+                
+                // Pulsing effect
+                const time = Date.now() * 0.005;
+                portal.scale.setScalar(1 + Math.sin(time) * 0.1);
+                glow.scale.setScalar(1 + Math.cos(time * 0.7) * 0.2);
+                
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            // Click handler
+            renderer.domElement.addEventListener('click', () => {
+                createSparkles(event.clientX, event.clientY);
+                setTimeout(() => nextPage(), 500);
+            });
+
+            scenes.page1 = { scene, camera, renderer };
+        }
+
+        function initPage2() {
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x000011, 1);
+            document.getElementById('canvas-container2').appendChild(renderer.domElement);
+
+            // Create planet
+            const planetGeometry = new THREE.SphereGeometry(3, 32, 32);
+            const planetMaterial = new THREE.MeshBasicMaterial({
+                color: 0x4a90e2,
+                transparent: true,
+                opacity: 0.8
+            });
+            const planet = new THREE.Mesh(planetGeometry, planetMaterial);
+            scene.add(planet);
+
+            // Add memory spots
+            const spotGeometry = new THREE.SphereGeometry(0.2, 16, 16);
+            const spotMaterial = new THREE.MeshBasicMaterial({ color: 0xff6b9d });
+            const spots = [];
+            
+            for (let i = 0; i < memories.length; i++) {
+                const spot = new THREE.Mesh(spotGeometry, spotMaterial);
+                const phi = Math.acos(-1 + (2 * i) / memories.length);
+                const theta = Math.sqrt(memories.length * Math.PI) * phi;
+                
+                spot.position.x = 3.2 * Math.cos(theta) * Math.sin(phi);
+                spot.position.y = 3.2 * Math.sin(theta) * Math.sin(phi);
+                spot.position.z = 3.2 * Math.cos(phi);
+                
+                spot.userData = { memoryIndex: i };
+                spots.push(spot);
+                scene.add(spot);
+            }
+
+            camera.position.z = 8;
+
+            let isDragging = false;
+            let previousMousePosition = { x: 0, y: 0 };
+
+            // Mouse/touch controls
+            renderer.domElement.addEventListener('mousedown', onMouseDown);
+            renderer.domElement.addEventListener('touchstart', onTouchStart);
+
+            function onMouseDown(event) {
+                isDragging = true;
+                previousMousePosition = { x: event.clientX, y: event.clientY };
+            }
+
+            function onTouchStart(event) {
+                isDragging = true;
+                const touch = event.touches[0];
+                previousMousePosition = { x: touch.clientX, y: touch.clientY };
+            }
+
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('touchmove', onTouchMove);
+
+            function onMouseMove(event) {
+                if (isDragging) {
+                    const deltaMove = {
+                        x: event.clientX - previousMousePosition.x,
+                        y: event.clientY - previousMousePosition.y
+                    };
+                    rotatePlanet(deltaMove);
+                    previousMousePosition = { x: event.clientX, y: event.clientY };
+                }
+            }
+
+            function onTouchMove(event) {
+                event.preventDefault();
+                if (isDragging) {
+                    const touch = event.touches[0];
+                    const deltaMove = {
+                        x: touch.clientX - previousMousePosition.x,
+                        y: touch.clientY - previousMousePosition.y
+                    };
+                    rotatePlanet(deltaMove);
+                    previousMousePosition = { x: touch.clientX, y: touch.clientY };
+                }
+            }
+
+            document.addEventListener('mouseup', () => isDragging = false);
+            document.addEventListener('touchend', () => isDragging = false);
+
+            function rotatePlanet(deltaMove) {
+                const deltaRotationQuaternion = new THREE.Quaternion()
+                    .setFromEuler(new THREE.Euler(
+                        toRadians(deltaMove.y * 1),
+                        toRadians(deltaMove.x * 1),
+                        0,
+                        'XYZ'
+                    ));
+                planet.quaternion.multiplyQuaternions(deltaRotationQuaternion, planet.quaternion);
+                spots.forEach(spot => {
+                    spot.quaternion.multiplyQuaternions(deltaRotationQuaternion, spot.quaternion);
+                });
+            }
+
+            function toRadians(angle) {
+                return angle * (Math.PI / 180);
+            }
+
+            // Click detection for spots
+            const raycaster = new THREE.Raycaster();
+            const mouse = new THREE.Vector2();
+
+            renderer.domElement.addEventListener('click', onSpotClick);
+
+            function onSpotClick(event) {
+                mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+                raycaster.setFromCamera(mouse, camera);
+                const intersects = raycaster.intersectObjects(spots);
+
+                if (intersects.length > 0) {
+                    const clickedSpot = intersects[0].object;
+                    const memoryIndex = clickedSpot.userData.memoryIndex;
+                    showMemory(memoryIndex);
+                    createSparkles(event.clientX, event.clientY);
+                }
+            }
+
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                // Animate memory spots
+                spots.forEach((spot, index) => {
+                    const time = Date.now() * 0.005 + index;
+                    spot.scale.setScalar(1 + Math.sin(time) * 0.3);
+                });
+                
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            scenes.page2 = { scene, camera, renderer };
+        }
+
+        function initPage3() {
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x000011, 1);
+            document.getElementById('canvas-container3').appendChild(renderer.domElement);
+
+            // Create star field
+            const stars = [];
+            for (let i = 0; i < starMessages.length; i++) {
+                const starGeometry = new THREE.SphereGeometry(0.1, 8, 8);
+                const starMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+                const star = new THREE.Mesh(starGeometry, starMaterial);
+                
+                star.position.x = (Math.random() - 0.5) * 20;
+                star.position.y = (Math.random() - 0.5) * 15;
+                star.position.z = (Math.random() - 0.5) * 10;
+                
+                star.userData = { messageIndex: i };
+                stars.push(star);
+                scene.add(star);
+            }
+
+            camera.position.z = 5;
+
+            // Click detection
+            const raycaster = new THREE.Raycaster();
+            const mouse = new THREE.Vector2();
+
+            renderer.domElement.addEventListener('click', onStarClick);
+
+            function onStarClick(event) {
+                mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+                raycaster.setFromCamera(mouse, camera);
+                const intersects = raycaster.intersectObjects(stars);
+
+                if (intersects.length > 0) {
+                    const clickedStar = intersects[0].object;
+                    const messageIndex = clickedStar.userData.messageIndex;
+                    showStarMessage(messageIndex);
+                    createSparkles(event.clientX, event.clientY);
+                }
+            }
+
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                // Animate stars
+                stars.forEach((star, index) => {
+                    const time = Date.now() * 0.003 + index;
+                    star.scale.setScalar(1 + Math.sin(time) * 0.5);
+                    star.material.opacity = 0.5 + Math.sin(time * 0.5) * 0.5;
+                });
+                
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            scenes.page3 = { scene, camera, renderer };
+        }
+
+        function initPage4() {
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x001122, 1);
+            document.getElementById('canvas-container4').appendChild(renderer.domElement);
+
+            // Create garden ground
+            const groundGeometry = new THREE.PlaneGeometry(20, 20);
+            const groundMaterial = new THREE.MeshBasicMaterial({ color: 0x2d5a3d });
+            const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+            ground.rotation.x = -Math.PI / 2;
+            ground.position.y = -3;
+            scene.add(ground);
+
+            // Create flowers
+            const flowers = [];
+            for (let i = 0; i < jokes.length; i++) {
+                const flowerGroup = new THREE.Group();
+                
+                // Stem
+                const stemGeometry = new THREE.CylinderGeometry(0.05, 0.05, 2);
+                const stemMaterial = new THREE.MeshBasicMaterial({ color: 0x4a7c59 });
+                const stem = new THREE.Mesh(stemGeometry, stemMaterial);
+                stem.position.y = -2;
+                flowerGroup.add(stem);
+                
+                // Petals
+                for (let j = 0; j < 6; j++) {
+                    const petalGeometry = new THREE.SphereGeometry(0.3, 8, 8);
+                    const petalMaterial = new THREE.MeshBasicMaterial({ 
+                        color: new THREE.Color().setHSL((i * 0.25) % 1, 0.7, 0.6) 
+                    });
+                    const petal = new THREE.Mesh(petalGeometry, petalMaterial);
+                    
+                    const angle = (j / 6) * Math.PI * 2;
+                    petal.position.x = Math.cos(angle) * 0.4;
+                    petal.position.z = Math.sin(angle) * 0.4;
+                    petal.position.y = -1;
+                    petal.scale.setScalar(0.1); // Start small for bloom effect
+                    
+                    flowerGroup.add(petal);
+                }
+                
+                // Center
+                const centerGeometry = new THREE.SphereGeometry(0.15, 8, 8);
+                const centerMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+                const center = new THREE.Mesh(centerGeometry, centerMaterial);
+                center.position.y = -1;
+                flowerGroup.add(center);
+                
+                // Position flower
+                flowerGroup.position.x = (Math.random() - 0.5) * 10;
+                flowerGroup.position.z = (Math.random() - 0.5) * 10;
+                
+                flowerGroup.userData = { jokeIndex: i, petals: flowerGroup.children.slice(1, 7) };
+                flowers.push(flowerGroup);
+                scene.add(flowerGroup);
+            }
+
+            camera.position.set(0, 2, 8);
+            camera.lookAt(0, -1, 0);
+
+            // Click detection
+            const raycaster = new THREE.Raycaster();
+            const mouse = new THREE.Vector2();
+
+            renderer.domElement.addEventListener('click', onFlowerClick);
+
+            function onFlowerClick(event) {
+                mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+                raycaster.setFromCamera(mouse, camera);
+                
+                const allFlowerParts = [];
+                flowers.forEach(flower => allFlowerParts.push(...flower.children));
+                
+                const intersects = raycaster.intersectObjects(allFlowerParts);
+
+                if (intersects.length > 0) {
+                    const clickedObject = intersects[0].object;
+                    const flower = flowers.find(f => f.children.includes(clickedObject));
+                    if (flower) {
+                        const jokeIndex = flower.userData.jokeIndex;
+                        bloomFlower(flower);
+                        showJoke(jokeIndex);
+                        createSparkles(event.clientX, event.clientY);
+                    }
+                }
+            }
+
+            function bloomFlower(flower) {
+                const petals = flower.userData.petals;
+                petals.forEach((petal, index) => {
+                    setTimeout(() => {
+                        petal.scale.setScalar(1);
+                    }, index * 100);
+                });
+            }
+
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                // Gentle swaying animation
+                flowers.forEach((flower, index) => {
+                    const time = Date.now() * 0.002 + index;
+                    flower.rotation.z = Math.sin(time) * 0.1;
+                });
+                
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            scenes.page4 = { scene, camera, renderer };
+        }
+
+        function initPage5() {
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x000011, 1);
+            document.getElementById('canvas-container5').appendChild(renderer.domElement);
+
+            // Create rocket
+            const rocketGroup = new THREE.Group();
+            
+            // Rocket body
+            const bodyGeometry = new THREE.CylinderGeometry(0.5, 0.5, 3);
+            const bodyMaterial = new THREE.MeshBasicMaterial({ color: 0xc0c0c0 });
+            const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+            rocketGroup.add(body);
+            
+            // Rocket nose
+            const noseGeometry = new THREE.ConeGeometry(0.5, 1);
+            const noseMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+            const nose = new THREE.Mesh(noseGeometry, noseMaterial);
+            nose.position.y = 2;
+            rocketGroup.add(nose);
+            
+            // Rocket fins
+            for (let i = 0; i < 4; i++) {
+                const finGeometry = new THREE.BoxGeometry(0.2, 1, 0.1);
+                const finMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+                const fin = new THREE.Mesh(finGeometry, finMaterial);
+                
+                const angle = (i / 4) * Math.PI * 2;
+                fin.position.x = Math.cos(angle) * 0.6;
+                fin.position.z = Math.sin(angle) * 0.6;
+                fin.position.y = -1;
+                
+                rocketGroup.add(fin);
+            }
+            
+            // Flame effect (initially hidden)
+            const flameGeometry = new THREE.ConeGeometry(0.3, 1.5);
+            const flameMaterial = new THREE.MeshBasicMaterial({ 
+                color: 0xff4500,
+                transparent: true,
+                opacity: 0
+            });
+            const flame = new THREE.Mesh(flameGeometry, flameMaterial);
+            flame.position.y = -2.5;
+            rocketGroup.add(flame);
+            
+            scene.add(rocketGroup);
+            camera.position.set(0, 0, 8);
+
+            // Click handler for rocket
+            renderer.domElement.addEventListener('click', () => {
+                launchRocket();
+                showRocketMessage();
+                createSparkles(event.clientX, event.clientY);
+            });
+
+            function launchRocket() {
+                flame.material.opacity = 1;
+                
+                // Animate rocket launch
+                const startY = rocketGroup.position.y;
+                const duration = 3000;
+                const startTime = Date.now();
+                
+                function animateLaunch() {
+                    const elapsed = Date.now() - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    
+                    rocketGroup.position.y = startY + progress * 20;
+                    rocketGroup.rotation.z = progress * Math.PI * 2;
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(animateLaunch);
+                    }
+                }
+                animateLaunch();
+            }
+
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                // Gentle rocket hover
+                const time = Date.now() * 0.003;
+                rocketGroup.position.y = Math.sin(time) * 0.2;
+                
+                // Flame flicker
+                flame.scale.y = 1 + Math.sin(time * 5) * 0.2;
+                
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            // Initialize countdown
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+
+            scenes.page5 = { scene, camera, renderer };
+        }
+
+        function updateCountdown() {
+            // Set return date (9 days from now - you can customize this)
+            const returnDate = new Date();
+            returnDate.setDate(returnDate.getDate() + 9);
+            
+            const now = new Date();
+            const difference = returnDate - now;
+            
+            if (difference > 0) {
+                const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+                
+                document.getElementById('countdownTimer').innerHTML = 
+                    `${days}d ${hours}h ${minutes}m ${seconds}s`;
+            } else {
+                document.getElementById('countdownTimer').innerHTML = "Welcome back! 🎉";
+            }
+        }
+
+        function createSparkles(x, y) {
+            for (let i = 0; i < 5; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.style.left = (x + (Math.random() - 0.5) * 100) + 'px';
+                sparkle.style.top = (y + (Math.random() - 0.5) * 100) + 'px';
+                document.body.appendChild(sparkle);
+                
+                setTimeout(() => sparkle.remove(), 1000);
+            }
+        }
+
+        function showMemory(index) {
+            const memory = memories[index];
+            document.getElementById('memoryTitle').textContent = memory.title;
+            document.getElementById('memoryContent').textContent = memory.content;
+            document.getElementById('memoryPopup').classList.add('show');
+        }
+
+        function showStarMessage(index) {
+            const message = starMessages[index];
+            document.getElementById('starTitle').textContent = message.title;
+            document.getElementById('starContent').textContent = message.content;
+            document.getElementById('starPopup').classList.add('show');
+        }
+
+        function showJoke(index) {
+            const joke = jokes[index];
+            document.getElementById('flowerTitle').textContent = joke.title;
+            document.getElementById('flowerContent').textContent = joke.content;
+            document.getElementById('flowerPopup').classList.add('show');
+        }
+
+        function showRocketMessage() {
+            document.getElementById('rocketPopup').classList.add('show');
+        }
+
+        function closePopup(popupId) {
+            document.getElementById(popupId).classList.remove('show');
+        }
+
+        function nextPage() {
+            if (currentPage < 5) {
+                document.getElementById(`page${currentPage}`).classList.remove('active');
+                currentPage++;
+                document.getElementById(`page${currentPage}`).classList.add('active');
+                
+                // Initialize page if not already done
+                switch(currentPage) {
+                    case 2: if (!scenes.page2) initPage2(); break;
+                    case 3: if (!scenes.page3) initPage3(); break;
+                    case 4: if (!scenes.page4) initPage4(); break;
+                    case 5: if (!scenes.page5) initPage5(); break;
+                }
+                
+                updateNavigation();
+            }
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                document.getElementById(`page${currentPage}`).classList.remove('active');
+                currentPage--;
+                document.getElementById(`page${currentPage}`).classList.add('active');
+                updateNavigation();
+            }
+        }
+
+        function updateNavigation() {
+            document.getElementById('prevBtn').disabled = currentPage === 1;
+            document.getElementById('nextBtn').disabled = currentPage === 5;
+            
+            if (currentPage === 5) {
+                document.getElementById('nextBtn').textContent = 'Launch! 🚀';
+            } else {
+                document.getElementById('nextBtn').textContent = 'Next →';
+            }
+        }
+
+        // Audio controls
+        document.getElementById('audioToggle').addEventListener('click', () => {
+            const audio = document.getElementById('backgroundMusic');
+            const button = document.getElementById('audioToggle');
+            
+            if (isAudioPlaying) {
+                audio.pause();
+                button.textContent = '🔇';
+                isAudioPlaying = false;
+            } else {
+                audio.play().catch(() => console.log('Audio autoplay blocked'));
+                button.textContent = '🎵';
+                isAudioPlaying = true;
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            Object.keys(scenes).forEach(pageKey => {
+                const { camera, renderer } = scenes[pageKey];
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        });
+
+        // Close popups when clicking outside
+        document.addEventListener('click', (event) => {
+            if (event.target.classList.contains('popup')) {
+                event.target.classList.remove('show');
+            }
+        });
+
+        // Initialize first page and hide loading
+        window.addEventListener('load', () => {
+            initPage1();
+            document.getElementById('loading').style.display = 'none';
+        });
+
+        // Prevent context menu on mobile
+        document.addEventListener('contextmenu', e => e.preventDefault());
+    </script>
+</body>
+</html>
